@@ -1,0 +1,46 @@
+{
+  "version": { "major": 1, "minor": 1 },
+  "generation": 44,
+  "stopped": false,
+  "displays": [
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000001",
+      "wallpaper": "AAAAAAAA-0000-0000-0000-000000000001",
+      "optimisedCopy": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/wallpaper.mov",
+      "poster": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/poster.heic",
+      "presentation": {
+        "fit": "fill",
+        "focalPoint": { "x": 0.5, "y": 0.5 },
+        "zoom": 1,
+        "pan": { "x": 0, "y": 0 }
+      },
+      "volume": 0,
+      "userPaused": false
+    },
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000002",
+      "wallpaper": "AAAAAAAA-0000-0000-0000-000000000003",
+      "optimisedCopy": "wallpapers/AAAAAAAA-0000-0000-0000-000000000003/scene.pkg",
+      "poster": "wallpapers/AAAAAAAA-0000-0000-0000-000000000003/poster.heic",
+      "presentation": {
+        "fit": "fit",
+        "focalPoint": { "x": 0.5, "y": 0.5 },
+        "zoom": 1,
+        "pan": { "x": 0, "y": 0 }
+      },
+      "volume": 0,
+      "userPaused": false,
+      "scene": {
+        "project": "wallpapers/AAAAAAAA-0000-0000-0000-000000000003/project.json",
+        "width": 3840,
+        "height": 2160
+      }
+    }
+  ],
+  "pauseRules": {
+    "whenDesktopCovered": true,
+    "whenDisplayAsleepOrLocked": true,
+    "inLowPowerMode": true,
+    "onBattery": false
+  }
+}

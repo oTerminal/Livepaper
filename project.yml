@@ -1,0 +1,218 @@
+name: Livepaper
+
+options:
+  bundleIdPrefix: app.livepaper
+  deploymentTarget:
+    macOS: "26.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+
+# The wallpaper extension, the render host, lives in its own file so
+# that it stays one include away from being left out.
+include:
+  - path: targets/extension.yml
+    relativePaths: false
+
+settings:
+  base:
+    SWIFT_VERSION: "6.0"
+    SWIFT_APPROACHABLE_CONCURRENCY: YES
+    SWIFT_DEFAULT_ACTOR_ISOLATION: MainActor
+    ARCHS: arm64
+    ONLY_ACTIVE_ARCH: YES
+    # The version lives here and nowhere else. MARKETING_VERSION is X.Y.Z and
+    # names the tag, v plus it; CURRENT_PROJECT_VERSION, the CFBundleVersion Sparkle
+    # orders updates by, rises by one per release, in the same commit.
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+    # Xcode never signs with the release certificate: every build here and in CI is
+    # ad-hoc, without the hardened runtime. Tools/release/sign.sh
+    # re-signs a Release product inside-out with the certificate, and only the
+    # release workflow's tag job holds it.
+    CODE_SIGN_STYLE: Manual
+    CODE_SIGN_IDENTITY: "-"
+    DEVELOPMENT_TEAM: ""
+    ENABLE_HARDENED_RUNTIME: NO
+
+packages:
+  LivepaperKit:
+    path: Packages/LivepaperKit
+  DesignSystem:
+    path: Packages/DesignSystem
+  # Updates. Pinned exactly, since Package.resolved is not checked in; the same
+  # version as Tools/release/sparkle.env, whose archive holds the tools that sign the feed.
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    exactVersion: 2.10.0
+
+targets:
+  Livepaper:
+    type: application
+    platform: macOS
+    sources:
+      - App
+      # The loops onboarding offers, with PROVENANCE.md beside them: one
+      # folder in the app's resources, where `SampleWallpaper.bundled` looks.
+      - path: Resources/Samples
+        type: folder
+        buildPhase: resources
+      # The About panel's notices, made by `make notices` from what ships.
+      - path: Resources/Credits.rtf
+        buildPhase: resources
+    scheme: {}
+    # The URL scheme. XcodeGen writes App/Info.plist from this at `make gen`, and
+    # Xcode merges it with the keys GENERATE_INFOPLIST_FILE makes from the INFOPLIST_KEY_
+    # settings below. No NSServices and no CFBundleDocumentTypes: importing is done in
+    # the app's window alone, so neither Services, Open With nor the Dock offers it a file.
+    info:
+      path: App/Info.plist
+      properties:
+        # XcodeGen's own defaults for these would win over the build settings.
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        # livepaper://<verb>?<key>=<value> (Command in LivepaperCore). Any web page can
+        # open the scheme, so it names wallpapers by ID and has no verb that imports.
+        CFBundleURLTypes:
+          - CFBundleURLName: app.livepaper.Livepaper.command
+            CFBundleURLSchemes: [livepaper]
+        # Sparkle 2: one feed for the app's life, on the orphan appcast branch
+        # served by GitHub Pages; every update's archive signed with EdDSA against
+        # this key. Checked once a day, sending nothing about the Mac, and an update
+        # is downloaded and installed only when the user clicks for it.
+        SUFeedURL: https://oterminal.github.io/Livepaper/appcast.xml
+        SUEnableAutomaticChecks: true
+        SUScheduledCheckInterval: 86400
+        SUEnableSystemProfiling: false
+        SUAutomaticallyUpdate: false
+        SUAllowsAutomaticUpdates: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.livepaper.Livepaper
+        GENERATE_INFOPLIST_FILE: YES
+        # The display name lives here and nowhere else.
+        INFOPLIST_KEY_CFBundleDisplayName: Livepaper
+        INFOPLIST_KEY_LSUIElement: YES
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSHumanReadableCopyright: "MIT License. Livepaper contributors."
+        ENABLE_APP_SANDBOX: NO
+        # Off on purpose, whatever Xcode's default becomes: codesign writes a
+        # temporary file beside the helper it signs, which a sandboxed script
+        # may not (tried with it on: "Write permissions error").
+        ENABLE_USER_SCRIPT_SANDBOXING: NO
+    dependencies:
+      - package: LivepaperKit
+        product: LivepaperCore
+      - package: LivepaperKit
+        product: LivepaperImport
+      - package: LivepaperKit
+        product: LivepaperPlayback
+      # What draws a scene, for the posters the app draws from scenes.
+      - package: LivepaperKit
+        product: LivepaperScene
+      - package: LivepaperKit
+        product: LivepaperSystem
+      # Workshop items through Valve's steamcmd with the user's own login.
+      - package: LivepaperKit
+        product: LivepaperWorkshop
+      # The fakes run (-fakes YES) builds the screens on its fakes.
+      - package: LivepaperKit
+        product: LivepaperTestSupport
+      - package: DesignSystem
+      # Updates: SPUStandardUpdaterController and Sparkle's own windows.
+      - package: Sparkle
+      # Embedded in Contents/Extensions, where ExtensionKit finds it.
+      - target: WallpaperExtension
+      # The `livepaper` tool ships inside the app, in Contents/Helpers: in
+      # Contents/MacOS it would collide with the app's `Livepaper` on a case-insensitive
+      # disk. Built first, and signed as it is copied, before Xcode signs the app,
+      # which seals it.
+      - target: livepaper-cli
+        embed: true
+        codeSign: true
+        copy:
+          destination: wrapper
+          subpath: Contents/Helpers
+    postBuildScripts:
+      # The ffmpeg helper goes next to the app's executable, where
+      # Bundle.main.url(forAuxiliaryExecutable:) finds it, signed on its own before
+      # Xcode signs the app, which seals it. It is there when `make ffmpeg` built it
+      # or CI fetched it; without it the build goes on, and the files only ffmpeg can
+      # open fail to import with `helperMissing`. A helper that goes is taken out of
+      # the bundle at the next build.
+      - name: Bundle the ffmpeg helper
+        basedOnDependencyAnalysis: true
+        inputFiles:
+          - $(SRCROOT)/Helpers/ffmpeg/out/ffmpeg
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(EXECUTABLE_FOLDER_PATH)/ffmpeg
+        script: |
+          set -eu
+          if [ -f "$SCRIPT_INPUT_FILE_0" ]; then
+            ditto "$SCRIPT_INPUT_FILE_0" "$SCRIPT_OUTPUT_FILE_0"
+            codesign --force --sign - --identifier "$PRODUCT_BUNDLE_IDENTIFIER.ffmpeg" --timestamp=none "$SCRIPT_OUTPUT_FILE_0"
+          else
+            rm -f "$SCRIPT_OUTPUT_FILE_0"
+            echo "note: no ffmpeg helper at $SCRIPT_INPUT_FILE_0; the app is built without it (make ffmpeg)"
+          fi
+      # The shader tools, glslang and spirv-cross, go in the same place
+      # the same way, each signed with an identifier of its own. They are there when
+      # `make shader-tools` built them or CI fetched them; without them the build goes
+      # on, and a scene imports without its programs and holds its poster until the
+      # app has the tools. A tool that goes is taken out of the bundle at the next build.
+      - name: Bundle the shader tools
+        basedOnDependencyAnalysis: true
+        inputFiles:
+          - $(SRCROOT)/Helpers/shader-tools/out/glslang
+          - $(SRCROOT)/Helpers/shader-tools/out/spirv-cross
+        outputFiles:
+          - $(TARGET_BUILD_DIR)/$(EXECUTABLE_FOLDER_PATH)/glslang
+          - $(TARGET_BUILD_DIR)/$(EXECUTABLE_FOLDER_PATH)/spirv-cross
+        script: |
+          set -eu
+          bundle() {
+            if [ -f "$1" ]; then
+              ditto "$1" "$2"
+              codesign --force --sign - --identifier "$PRODUCT_BUNDLE_IDENTIFIER.$3" --timestamp=none "$2"
+            else
+              rm -f "$2"
+              echo "note: no $3 at $1; the app is built without it (make shader-tools)"
+            fi
+          }
+          bundle "$SCRIPT_INPUT_FILE_0" "$SCRIPT_OUTPUT_FILE_0" glslang
+          bundle "$SCRIPT_INPUT_FILE_1" "$SCRIPT_OUTPUT_FILE_1" spirv-cross
+
+  Gallery:
+    type: application
+    platform: macOS
+    sources: [Gallery]
+    scheme: {}
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: app.livepaper.Gallery
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Livepaper Gallery
+        ENABLE_APP_SANDBOX: NO
+    dependencies:
+      - package: DesignSystem
+
+  livepaper-cli:
+    type: tool
+    platform: macOS
+    sources: [CLI]
+    scheme: {}
+    settings:
+      base:
+        PRODUCT_NAME: livepaper
+        # Without this the module would be "livepaper", which collides with the
+        # app's "Livepaper" module on a case-insensitive disk.
+        PRODUCT_MODULE_NAME: LivepaperCLI
+        PRODUCT_BUNDLE_IDENTIFIER: app.livepaper.cli
+        # An Info.plist inside the binary, so that its signature names it by this
+        # identifier and carries the app's version, rather than `livepaper-<hash>`.
+        GENERATE_INFOPLIST_FILE: YES
+        CREATE_INFOPLIST_SECTION_IN_BINARY: YES
+        SWIFT_DEFAULT_ACTOR_ISOLATION: nonisolated
+    dependencies:
+      # The command grammar, the socket's path and the reply: the tool reads no library file.
+      - package: LivepaperKit
+        product: LivepaperCore

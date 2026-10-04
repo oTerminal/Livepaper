@@ -1,0 +1,67 @@
+included:
+  - App
+  - WallpaperExtension
+  - Gallery
+  - CLI
+  - Packages
+  - Tools/soak
+  - Tools/release
+
+excluded:
+  - Packages/LivepaperKit/.build
+  - Packages/DesignSystem/.build
+  - Tools/soak/.build
+  - Tools/release/.build
+  - build
+
+disabled_rules:
+  - todo
+  - trailing_comma
+
+line_length:
+  warning: 140
+  error: 200
+  ignores_comments: true
+
+identifier_name:
+  min_length: 2
+  excluded: [x, y, id, ui]
+
+# Design rules. Motion and shape values live in
+# Packages/DesignSystem; everywhere else uses the tokens.
+custom_rules:
+  no_ease_in:
+    name: "No ease-in"
+    regex: '\.easeIn\b(?!Out)'
+    message: "UI never eases in: it delays the response the user is waiting for. Use Motion.enter or Motion.exit."
+    severity: error
+
+  no_bare_scale_transition:
+    name: "No scale-from-zero transition"
+    regex: '\.transition\(\s*\.scale\s*\)'
+    message: "A bare .scale transition starts from 0. Scale from 0.96 with opacity and an anchor."
+    severity: error
+
+  raw_animation_outside_design_system:
+    name: "Raw animation outside DesignSystem"
+    regex: '\.(spring|easeOut|easeInOut|linear|smooth|snappy|bouncy|interactiveSpring|timingCurve)\('
+    excluded: "Packages/DesignSystem/.*"
+    message: "Build animations from Motion tokens in DesignSystem."
+    severity: error
+
+  raw_corner_radius_outside_design_system:
+    name: "Raw corner radius outside DesignSystem"
+    regex: 'cornerRadius:\s*\d'
+    excluded: "Packages/DesignSystem/.*"
+    message: "Use radius tokens or ConcentricRectangle from DesignSystem."
+    severity: error
+
+  # The source is published and the planning documents are not: a comment says
+  # what it means, not where it was decided.
+  no_private_document_reference:
+    name: "No reference to a private document"
+    regex: '(?i:\brecords? 0\d{3}\b|docs/(adr|specs|reports|research|design)|\broadmap\.md|Spikes/|CONTEXT\.md|DECISIONS\.md)|\(M\d{1,2}\)|\bM\d{1,2}(\x27s\b|-[a-z])'
+    # Tools/soak is private, and its scripts write the soak's private reports.
+    excluded: "Tools/soak/.*"
+    message: "Published code does not point at the private planning documents: say what the comment means instead."
+    severity: error

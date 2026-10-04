@@ -1,0 +1,115 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  ffmpeg:
+    # The import helper, built from pinned source by
+    # Helpers/ffmpeg/build.sh. The artefact is what the LGPL asks for next to the
+    # binary: the exact source archive, the build script and the licence texts.
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      # build.sh holds the version, the sha256 and the flags, so its hash names the
+      # build. On a hit the script finds out/ current, checks it again and stops.
+      - name: Restore the last build
+        uses: actions/cache@v4
+        with:
+          path: |
+            Helpers/ffmpeg/out
+            Helpers/ffmpeg/src
+          key: ffmpeg-helper-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Helpers/ffmpeg/build.sh') }}
+      - name: Build
+        run: make ffmpeg
+      - name: Build info
+        run: cat Helpers/ffmpeg/out/BUILD-INFO.txt
+      - name: Publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-helper-arm64
+          path: Helpers/ffmpeg/out/
+          if-no-files-found: error
+
+  shader-tools:
+    # glslang and SPIRV-Cross, which translate a scene's shaders to Metal at import
+    # built from pinned source by Helpers/shader-tools/build.sh.
+    # The artefact carries the source archives, the build script and the licence
+    # texts next to the binaries.
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      # As for ffmpeg: build.sh holds the versions, the sha256s and the flags.
+      - name: Restore the last build
+        uses: actions/cache@v4
+        with:
+          path: |
+            Helpers/shader-tools/out
+            Helpers/shader-tools/src
+          key: shader-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Helpers/shader-tools/build.sh') }}
+      - name: Build
+        run: make shader-tools
+      - name: Build info
+        run: cat Helpers/shader-tools/out/BUILD-INFO.txt
+      - name: Publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: shader-tools-arm64
+          path: Helpers/shader-tools/out/
+          if-no-files-found: error
+
+  check:
+    # macos-26 (arm64) ships Xcode 26.x. The code targets that Swift floor, so
+    # Swift features newer than the image's default Xcode stay out until it moves.
+    needs: [ffmpeg, shader-tools]
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install xcodegen swiftlint
+      - name: Toolchain
+        run: xcodebuild -version && swift --version
+      - name: Lint
+        run: make lint
+      - name: Fetch the ffmpeg helper
+        uses: actions/download-artifact@v4
+        with:
+          name: ffmpeg-helper-arm64
+          path: Helpers/ffmpeg/out
+      # Artefacts do not keep file modes.
+      - name: Make the helper executable
+        run: chmod +x Helpers/ffmpeg/out/ffmpeg && Helpers/ffmpeg/out/ffmpeg -hide_banner -version
+      - name: Fetch the shader tools
+        uses: actions/download-artifact@v4
+        with:
+          name: shader-tools-arm64
+          path: Helpers/shader-tools/out
+      - name: Make the shader tools executable
+        run: |
+          chmod +x Helpers/shader-tools/out/glslang Helpers/shader-tools/out/spirv-cross
+          Helpers/shader-tools/out/glslang --version
+          Helpers/shader-tools/out/spirv-cross --revision
+      # With the variables set, the import tests fail instead of skipping when a
+      # helper is missing: this is where CI runs them on the fixtures.
+      - name: Test
+        env:
+          LIVEPAPER_REQUIRE_FFMPEG: "1"
+          LIVEPAPER_REQUIRE_SHADER_TOOLS: "1"
+          # A test process that crashes prints where, not only its signal.
+          SWIFT_BACKTRACE: "enable=yes,interactive=no,sanitize=no,threads=crashed"
+        run: make test
+      - name: Build
+        run: make build
+      # The release's dry run: the disk image, the zip and an appcast entry, ad-hoc signed with a
+      # throwaway EdDSA key, verified and installed on this runner, publishing nothing.
+      - name: Release dry run
+        run: Tools/release/release.sh --dry-run --install

@@ -1,0 +1,60 @@
+{
+  "version": { "major": 1, "minor": 1 },
+  "wallpapers": [
+    {
+      "id": "AAAAAAAA-0000-0000-0000-000000000001",
+      "name": "Ocean at Dusk",
+      "isFavourite": true,
+      "importedAt": 811677600.25,
+      "fingerprint": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "optimisedCopy": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/wallpaper.mov",
+      "poster": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/poster.heic",
+      "hoverPreview": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/hover.mov",
+      "details": {
+        "duration": 12.5,
+        "width": 3840,
+        "height": 2160,
+        "frameRate": 60,
+        "codec": "hevc",
+        "byteCount": 48000000
+      },
+      "presentation": {
+        "fit": "fill",
+        "focalPoint": { "x": 0.25, "y": 0.5 },
+        "zoom": 1.5,
+        "pan": { "x": 0.1, "y": -0.2 }
+      },
+      "volume": 0.4
+    },
+    {
+      "id": "AAAAAAAA-0000-0000-0000-000000000003",
+      "name": "Lantern Street",
+      "isFavourite": false,
+      "importedAt": 811678200,
+      "fingerprint": "2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae",
+      "optimisedCopy": "wallpapers/AAAAAAAA-0000-0000-0000-000000000003/scene.pkg",
+      "poster": "wallpapers/AAAAAAAA-0000-0000-0000-000000000003/poster.heic",
+      "hoverPreview": "wallpapers/AAAAAAAA-0000-0000-0000-000000000003/hover.mov",
+      "details": {
+        "duration": 0,
+        "width": 3840,
+        "height": 2160,
+        "frameRate": 30,
+        "codec": "scene",
+        "byteCount": 16000000
+      },
+      "presentation": {
+        "fit": "fill",
+        "focalPoint": { "x": 0.5, "y": 0.5 },
+        "zoom": 1,
+        "pan": { "x": 0, "y": 0 }
+      },
+      "volume": 0,
+      "scene": {
+        "project": "wallpapers/AAAAAAAA-0000-0000-0000-000000000003/project.json",
+        "width": 3840,
+        "height": 2160
+      }
+    }
+  ]
+}

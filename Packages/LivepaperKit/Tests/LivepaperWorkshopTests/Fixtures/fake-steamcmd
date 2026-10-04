@@ -1,0 +1,142 @@
+#!/bin/bash
+# A stand-in for Valve's steamcmd, for LivepaperWorkshopTests. It speaks the
+# console as Valve's macOS steamcmd did on 2026-09-23 (SteamOutputTests has the
+# lines), and keeps its "saved login" as a file under $HOME, as the real one
+# keeps it under ~/Library/Application Support/Steam. As the real one did on
+# 2026-09-24, it forgets a login at `logout` but writes that down only when it
+# quits: stopped at a prompt, it leaves the saved login in place. A saved login
+# whose file says "revoked" is one Steam refuses. It never touches the
+# network, and what it "downloads" is a Wallpaper Engine video item it writes
+# itself: a project.json and an empty video file.
+#
+# Set in its environment by the tests:
+#   FAKE_PASSWORD   the account's password
+#   FAKE_GUARD      none, email, app (a code) or approve (the Steam Mobile app)
+#   FAKE_CODE       the Steam Guard code it takes
+#   FAKE_UPDATE     1: the first run updates itself and exits 42, as steamcmd.sh expects
+#   FAKE_CRASH      1: it dies once signed in
+#   FAKE_SILENT     1: it never shows its console
+#   FAKE_KEEP_LOGIN 1: its logout keeps the saved login
+
+set -f
+state="$HOME/fake-steam"
+mkdir -p "$state"
+# What it was started with, for the tests to read: never a password or an account name.
+printf '%s\n' "$@" > "$state/arguments"
+echo started >> "$state/starts"
+
+if [ "$FAKE_UPDATE" = 1 ] && [ ! -f "$state/updated" ]; then
+    printf '[  0%%] Checking for available updates...\r\n[ 50%%] Downloading update (1,024 of 2,048 KB)...\r\n'
+    printf '[100%%] Download Complete.\r\n[----] Applying update...\r\n'
+    touch "$state/updated"
+    exit 42
+fi
+
+if [ "$FAKE_SILENT" = 1 ]; then
+    # Waits on a program of its own, as steamcmd waits on what it starts, and says which.
+    sleep 30 &
+    echo $! > "$state/sleeper"
+    wait $!
+    exit 0
+fi
+
+printf "Redirecting stderr to '%s/Library/Application Support/Steam/logs/stderr.txt'\r\n" "$HOME"
+printf '[  0%%] Checking for available updates...\r\n[----] Verifying installation...\r\n'
+printf 'Steam Console Client (c) Valve Corporation - version 1788292693\r\n'
+printf -- "-- type 'quit' to exit --\r\nLoading Steam API...OK\r\n"
+printf '"@sSteamCmdForcePlatformType" = "windows"\r\n'
+
+account=""
+signed_in=0
+# The account whose saved login `logout` forgot; its file goes only at `quit`.
+forgotten=""
+console() { printf '\r\nSteam>'; }
+
+# A code prompt; answers whether the code typed was the right one.
+guard_code() {
+    printf '%s' "$1"
+    IFS= read -r code
+    [ "$code" = "$FAKE_CODE" ]
+}
+
+console
+while IFS= read -r line; do
+    set -- $line
+    case "$1" in
+    login)
+        account="$2"
+        if [ -f "$state/login-$account" ] && [ "$forgotten" != "$account" ]; then
+            printf 'Logging in using cached credentials.\r\n'
+            printf "Logging in user '%s' [U:1:0] to Steam Public..." "$account"
+            if [ "$(cat "$state/login-$account")" = revoked ]; then
+                printf 'ERROR (Access Denied)\r\n'
+                console
+                continue
+            fi
+        else
+            printf 'Cached credentials not found.\r\n\r\npassword: '
+            IFS= read -r password
+            printf '\r\nProceeding with login using username/password.\r\n'
+            printf "Logging in user '%s' [U:1:0] to Steam Public..." "$account"
+            if [ "$password" != "$FAKE_PASSWORD" ]; then
+                printf 'ERROR (Invalid Password)\r\n'
+                console
+                continue
+            fi
+            case "$FAKE_GUARD" in
+            email)
+                printf '\r\nThis computer has not been authenticated for your account using Steam Guard.\r\n'
+                if ! guard_code 'Steam Guard code:'; then printf 'ERROR (Invalid Login Auth Code)\r\n'; console; continue; fi
+                ;;
+            app)
+                printf '\r\n'
+                if ! guard_code 'Two-factor code:'; then printf 'ERROR (Two-factor code mismatch)\r\n'; console; continue; fi
+                ;;
+            approve)
+                printf '\r\nThis account is protected by a Steam Guard mobile authenticator.\r\n'
+                printf 'Please confirm the login in the Steam Mobile app on your phone.\r\n\r\nWaiting for confirmation...'
+                sleep 0.2
+                printf '\r\nWaiting for confirmation...'
+                sleep 0.2
+                printf 'OK\r\n'
+                ;;
+            esac
+            : > "$state/login-$account"
+            forgotten=""
+        fi
+        printf 'OK\r\nWaiting for client config...OK\r\nWaiting for user info...OK\r\n'
+        signed_in=1
+        if [ "$FAKE_CRASH" = 1 ]; then exit 3; fi
+        ;;
+    workshop_download_item)
+        app="$2"
+        item="$3"
+        printf 'Downloading item %s ...\r\n' "$item"
+        if [ "$signed_in" != 1 ] || [ "$app" != 431960 ]; then
+            printf 'ERROR! Download item %s failed (Failure).\r\n' "$item"
+        elif [ "$item" = 1 ]; then
+            printf 'ERROR! Download item %s failed (File Not Found).\r\n' "$item"
+        else
+            folder="$HOME/Library/Application Support/Steam/steamapps/workshop/content/431960/$item"
+            mkdir -p "$folder"
+            printf '{"type": "video", "file": "loop.mp4", "title": "Fake Item %s"}' "$item" > "$folder/project.json"
+            : > "$folder/loop.mp4"
+            printf '\r\nSuccess. Downloaded item %s to "%s" (%s bytes) \r\n' "$item" "$folder" 58
+        fi
+        ;;
+    logout)
+        if [ "$FAKE_KEEP_LOGIN" != 1 ]; then forgotten="$account"; fi
+        signed_in=0
+        ;;
+    quit)
+        printf 'Unloading Steam API...OK\r\n'
+        if [ -n "$forgotten" ]; then rm -f "$state/login-$forgotten"; fi
+        exit 0
+        ;;
+    *)
+        printf 'Command not found: %s\r\n' "$1"
+        ;;
+    esac
+    console
+done
+exit 0

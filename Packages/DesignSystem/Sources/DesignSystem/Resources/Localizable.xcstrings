@@ -1,0 +1,205 @@
+{
+  "sourceLanguage" : "en",
+  "strings" : {
+    "%@ is already used by %@" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$@ is already used by %2$@"
+          }
+        }
+      }
+    },
+    "%@×" : {
+
+    },
+    "%lld percent from the left, %lld percent from the top" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "%1$lld percent from the left, %2$lld percent from the top"
+          }
+        }
+      }
+    },
+    "All Displays" : {
+
+    },
+    "Allow %@ in System Settings to finish turning this on." : {
+
+    },
+    "Cancel Import" : {
+
+    },
+    "Choose Display" : {
+
+    },
+    "Clear shortcut" : {
+
+    },
+    "Dismiss" : {
+
+    },
+    "Done" : {
+
+    },
+    "Esc to cancel, Delete to clear" : {
+
+    },
+    "Failed" : {
+
+    },
+    "Favourite" : {
+
+    },
+    "Finished" : {
+
+    },
+    "Focal point" : {
+
+    },
+    "Login item not found. Move %@ to the Applications folder and try again." : {
+
+    },
+    "Move down" : {
+
+    },
+    "Move left" : {
+
+    },
+    "Move right" : {
+
+    },
+    "Move up" : {
+
+    },
+    "Mute" : {
+
+    },
+    "Muted, %@" : {
+
+    },
+    "New Playlist…" : {
+
+    },
+    "Next Wallpaper" : {
+
+    },
+    "No Playlist" : {
+
+    },
+    "No wallpaper" : {
+
+    },
+    "None" : {
+
+    },
+    "Off" : {
+
+    },
+    "On" : {
+
+    },
+    "Open System Settings…" : {
+
+    },
+    "Open at Login" : {
+
+    },
+    "Pause" : {
+
+    },
+    "Play" : {
+
+    },
+    "Playlist" : {
+
+    },
+    "Position and zoom" : {
+
+    },
+    "Press to record a shortcut" : {
+
+    },
+    "Previous Wallpaper" : {
+
+    },
+    "Recent Wallpapers" : {
+
+    },
+    "Record Shortcut" : {
+
+    },
+    "Recording" : {
+
+    },
+    "Reset" : {
+
+    },
+    "Restart" : {
+
+    },
+    "Retry Import" : {
+
+    },
+    "Set on %@" : {
+
+    },
+    "Set on Display" : {
+
+    },
+    "Setting" : {
+
+    },
+    "Space" : {
+
+    },
+    "Step %lld of %lld" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Step %1$lld of %2$lld"
+          }
+        }
+      }
+    },
+    "Type shortcut" : {
+
+    },
+    "Unfavourite" : {
+
+    },
+    "Unmute" : {
+
+    },
+    "Volume" : {
+
+    },
+    "Waiting" : {
+
+    },
+    "Wallpaper service not responding" : {
+
+    },
+    "Warning" : {
+
+    },
+    "Zoom" : {
+
+    },
+    "Zoom %@, moved %lld percent across and %lld percent down" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "new",
+            "value" : "Zoom %1$@, moved %2$lld percent across and %3$lld percent down"
+          }
+        }
+      }
+    }
+  },
+  "version" : "1.0"
+}

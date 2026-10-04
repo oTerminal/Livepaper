@@ -1,0 +1,78 @@
+Livepaper includes code adapted from Phosphene
+  https://github.com/kageroumado/phosphene  (commit 8b5bd57, 2026-09-03)
+
+Each file below carries a header naming Phosphene.
+
+Packages/LivepaperKit/Sources/WallpaperAgentBridgeObjC/include/WallpaperAgentBridgeObjC.h
+    the private protocol and CAContext declarations
+Packages/LivepaperKit/Sources/WallpaperAgentBridge/
+    WallpaperAgentBridge.swift    the framework, the payload class names and the
+                                  video layer's _setDisallowsVideoLayerDisplayCompositing:
+    Replies.swift                 remote-context and snapshot object construction
+    SettingsViewModels.swift      the Codable shims for the settings view models and
+                                  the archive/unarchive class remap
+    WallpaperAgentListener.swift  the NSXPCInterface per-selector class whitelist
+    AgentPayload.swift            request field extraction by Mirror
+    AgentConnection.swift         the acquire flow and the answers to unused calls
+    RemoteContext.swift           the remote CAContext per surface
+Packages/LivepaperKit/Sources/LivepaperPlayback/
+    LoopEngine.swift, LoopEngine+Lifecycle.swift, LoopEngine+Feeding.swift,
+    LoopEngine+Reading.swift, PassLedger.swift
+                                  the two-reader gapless loop with a timestamp offset
+                                  and compressed samples passed through
+    SurfaceLayers.swift, SurfaceLayers+Transitions.swift, SurfaceTree.swift
+                                  one layer tree per surface, built before the first
+                                  reply, with both video layers made up front
+    SurfaceStore.swift            surfaces that outlive the agent's connection, and
+                                  the grace period before a teardown
+WallpaperExtension/
+    AgentRequests.swift           the acquire flow: the tree set in the context and
+                                  flushed before the reply
+    HostedSurfaces.swift          one remote context per surface, kept by surface ID
+                                  so that it outlives the agent's connection
+
+No GPL project was read for this work.
+
+Phosphene's licence:
+
+MIT License
+
+Copyright (c) 2026 kageroumado
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+Livepaper also bundles two command-line tools, built from source by
+Helpers/shader-tools/build.sh. The importer runs them as
+separate processes to translate a scene's shaders to Metal. Neither is linked
+into the app.
+
+glslang 16.6.0
+  https://github.com/KhronosGroup/glslang
+    BSD-3-Clause, with BSD-2-Clause, Apache-2.0 and MIT-Khronos-old for some
+    files, and NVIDIA's licence (AML-glslang) for the preprocessor. Its
+    Bison-generated parser is GPL-3.0-or-later with the Bison exception 2.2.
+
+SPIRV-Cross vulkan-sdk-1.4.357.0
+  https://github.com/KhronosGroup/SPIRV-Cross
+    Apache-2.0. The SPIR-V headers it compiles in are MIT and Khronos's free-use
+    licence (LicenseRef-KhronosFreeUse).
+
+Their licence texts are in Helpers/shader-tools/licenses/ and ship with the
+binaries.

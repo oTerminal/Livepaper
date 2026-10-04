@@ -1,0 +1,46 @@
+{
+  "version": { "major": 1, "minor": 9 },
+  "openAtLogin": true,
+  "hotkeys": [
+    { "action": "nextWallpaper", "keyCode": 45, "modifiers": 9, "keyLabel": "N" }
+  ],
+  "assignments": [
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000001",
+      "assignment": { "wallpaper": "AAAAAAAA-0000-0000-0000-000000000001" },
+      "crossfadeSeconds": 1.5
+    }
+  ],
+  "playlists": [
+    {
+      "id": "BBBBBBBB-0000-0000-0000-000000000001",
+      "name": "Evening",
+      "wallpapers": ["AAAAAAAA-0000-0000-0000-000000000001"],
+      "interval": 600,
+      "shuffle": false,
+      "colour": "indigo"
+    }
+  ],
+  "rotation": [
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000001",
+      "state": {
+        "current": "AAAAAAAA-0000-0000-0000-000000000001",
+        "position": 0,
+        "upcoming": [],
+        "history": ["AAAAAAAA-0000-0000-0000-000000000002"]
+      }
+    }
+  ],
+  "pauseRules": {
+    "whenDesktopCovered": true,
+    "whenDisplayAsleepOrLocked": true,
+    "inLowPowerMode": true,
+    "onBattery": false,
+    "whenGaming": true
+  },
+  "pausedDisplays": [],
+  "isMuted": true,
+  "sortOrder": "newestFirst",
+  "recents": []
+}

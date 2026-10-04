@@ -1,0 +1,35 @@
+# The wallpaper extension: the render host. WallpaperAgent launches it,
+# asks it for a remote CAContext per surface, and composites that on the desktop, the
+# lock screen and the System Settings preview. Included from project.yml and embedded
+# in the app, which is where ExtensionKit discovers it.
+targets:
+  WallpaperExtension:
+    type: extensionkit-extension
+    platform: macOS
+    sources:
+      - path: WallpaperExtension
+        excludes: ["*.entitlements", "Info.plist"]
+    settings:
+      base:
+        PRODUCT_NAME: WallpaperExtension
+        # The wallpaper store keys the user's selection by this identifier: chosen once
+        # and never changed. WallpaperExtensionIdentity in LivepaperCore carries the same value.
+        PRODUCT_BUNDLE_IDENTIFIER: app.livepaper.Livepaper.WallpaperExtension
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_FILE: WallpaperExtension/Info.plist
+        INFOPLIST_KEY_CFBundleDisplayName: Livepaper
+        INFOPLIST_KEY_NSHumanReadableCopyright: "MIT License. Livepaper contributors."
+        # The sandbox is the extension point's one requirement; the entitlements add the
+        # read-only exception for the library. Ad-hoc signed, as the app is.
+        CODE_SIGN_ENTITLEMENTS: WallpaperExtension/WallpaperExtension.entitlements
+        ENABLE_APP_SANDBOX: YES
+    dependencies:
+      - package: LivepaperKit
+        product: LivepaperCore
+      - package: LivepaperKit
+        product: LivepaperPlayback
+      - package: LivepaperKit
+        product: WallpaperAgentBridge
+      # What draws a scene in the Metal slot.
+      - package: LivepaperKit
+        product: LivepaperScene

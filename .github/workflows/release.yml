@@ -1,0 +1,105 @@
+name: Release
+
+# A v<X.Y.Z> tag, and nothing else, starts a release. Tools/release/release.sh
+# does the work and refuses a wrong tag, a build not above the appcast's last, an
+# existing release, an ad-hoc or foreign signature, a missing secret, and whatever
+# verify.sh refuses. Its dry run is the check job's last step in ci.yml.
+on:
+  push:
+    tags: ["v*"]
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  # The helpers, as ci.yml builds them; the cache makes these quick.
+  ffmpeg:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore the last build
+        uses: actions/cache@v4
+        with:
+          path: |
+            Helpers/ffmpeg/out
+            Helpers/ffmpeg/src
+          key: ffmpeg-helper-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Helpers/ffmpeg/build.sh') }}
+      - name: Build
+        run: make ffmpeg
+      - name: Publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-helper-arm64
+          path: Helpers/ffmpeg/out/
+          if-no-files-found: error
+
+  shader-tools:
+    runs-on: macos-26
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - name: Restore the last build
+        uses: actions/cache@v4
+        with:
+          path: |
+            Helpers/shader-tools/out
+            Helpers/shader-tools/src
+          key: shader-tools-${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('Helpers/shader-tools/build.sh') }}
+      - name: Build
+        run: make shader-tools
+      - name: Publish
+        uses: actions/upload-artifact@v4
+        with:
+          name: shader-tools-arm64
+          path: Helpers/shader-tools/out/
+          if-no-files-found: error
+
+  release:
+    needs: [ffmpeg, shader-tools]
+    runs-on: macos-26
+    timeout-minutes: 45
+    # The certificate, its password and Sparkle's EdDSA key are this environment's
+    # secrets and nowhere else in CI.
+    environment: release
+    permissions:
+      # The release, and the appcast branch.
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install tools
+        run: brew install xcodegen swiftlint
+      - name: Toolchain
+        run: xcodebuild -version && swift --version
+      - name: Fetch the ffmpeg helper
+        uses: actions/download-artifact@v4
+        with:
+          name: ffmpeg-helper-arm64
+          path: Helpers/ffmpeg/out
+      - name: Fetch the shader tools
+        uses: actions/download-artifact@v4
+        with:
+          name: shader-tools-arm64
+          path: Helpers/shader-tools/out
+      # Artefacts do not keep file modes.
+      - name: Make the helpers executable
+        run: chmod +x Helpers/ffmpeg/out/ffmpeg Helpers/shader-tools/out/glslang Helpers/shader-tools/out/spirv-cross
+      - name: Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GIT_AUTHOR_NAME: github-actions[bot]
+          GIT_AUTHOR_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          GIT_COMMITTER_NAME: github-actions[bot]
+          GIT_COMMITTER_EMAIL: 41898282+github-actions[bot]@users.noreply.github.com
+          LIVEPAPER_SIGNING_P12: ${{ secrets.LIVEPAPER_SIGNING_P12 }}
+          LIVEPAPER_SIGNING_P12_PASSWORD: ${{ secrets.LIVEPAPER_SIGNING_P12_PASSWORD }}
+          SPARKLE_ED_PRIVATE_KEY: ${{ secrets.SPARKLE_ED_PRIVATE_KEY }}
+        run: Tools/release/release.sh --install
+      # release.sh deletes it on any exit; this covers a runner that killed the script.
+      - name: Delete the run's keychain
+        if: always()
+        run: security delete-keychain "$RUNNER_TEMP/livepaper-release.keychain-db" 2>/dev/null || true

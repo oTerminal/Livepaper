@@ -1,0 +1,54 @@
+{
+  "version": { "major": 1, "minor": 0 },
+  "wallpapers": [
+    {
+      "id": "AAAAAAAA-0000-0000-0000-000000000001",
+      "name": "Ocean at Dusk",
+      "isFavourite": true,
+      "importedAt": 811677600.25,
+      "fingerprint": "9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08",
+      "optimisedCopy": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/wallpaper.mov",
+      "poster": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/poster.heic",
+      "hoverPreview": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/hover.mov",
+      "details": {
+        "duration": 12.5,
+        "width": 3840,
+        "height": 2160,
+        "frameRate": 60,
+        "codec": "hevc",
+        "byteCount": 48000000
+      },
+      "presentation": {
+        "fit": "fill",
+        "focalPoint": { "x": 0.25, "y": 0.5 },
+        "zoom": 1.5,
+        "pan": { "x": 0.1, "y": -0.2 }
+      },
+      "volume": 0.4
+    },
+    {
+      "id": "AAAAAAAA-0000-0000-0000-000000000002",
+      "name": "Café Lights",
+      "isFavourite": false,
+      "importedAt": 811677900,
+      "fingerprint": "60303ae22b998861bce3b28f33eec1be758a213c86c93c076dbe9f558c11c752",
+      "optimisedCopy": "wallpapers/AAAAAAAA-0000-0000-0000-000000000002/wallpaper.mov",
+      "poster": "wallpapers/AAAAAAAA-0000-0000-0000-000000000002/poster.heic",
+      "details": {
+        "duration": 8,
+        "width": 1080,
+        "height": 1920,
+        "frameRate": 29.97,
+        "codec": "h264",
+        "byteCount": 9500000
+      },
+      "presentation": {
+        "fit": "stretch",
+        "focalPoint": { "x": 0.5, "y": 0.5 },
+        "zoom": 1,
+        "pan": { "x": 0, "y": 0 }
+      },
+      "volume": 0
+    }
+  ]
+}

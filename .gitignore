@@ -1,0 +1,33 @@
+# Xcode / XcodeGen (the project, and the app's Info.plist, are generated from project.yml)
+*.xcodeproj
+App/Info.plist
+*.xcworkspace
+xcuserdata/
+DerivedData/
+build/
+
+# SwiftPM
+.build/
+.swiftpm/
+Package.resolved
+
+# macOS
+.DS_Store
+
+# Workspace-local agent scratch space
+.context/
+
+# Signing material and release artefacts never belong in the repo
+*.p12
+*.pem
+*.key
+*.keychain-db
+*.dmg
+.env
+
+# Built helper binaries (built from source by Helpers/ffmpeg/build.sh and
+# Helpers/shader-tools/build.sh)
+Helpers/ffmpeg/out/
+Helpers/ffmpeg/src/
+Helpers/shader-tools/out/
+Helpers/shader-tools/src/

@@ -1,0 +1,69 @@
+{
+  "version": { "major": 1, "minor": 1 },
+  "assignments": [
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000001",
+      "assignment": { "wallpaper": "AAAAAAAA-0000-0000-0000-000000000001" }
+    },
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000002",
+      "assignment": { "playlist": "BBBBBBBB-0000-0000-0000-000000000001" }
+    }
+  ],
+  "applyToAll": { "wallpaper": "AAAAAAAA-0000-0000-0000-000000000002" },
+  "playlists": [
+    {
+      "id": "BBBBBBBB-0000-0000-0000-000000000001",
+      "name": "Evening",
+      "wallpapers": [
+        "AAAAAAAA-0000-0000-0000-000000000001",
+        "AAAAAAAA-0000-0000-0000-000000000002",
+        "AAAAAAAA-0000-0000-0000-000000000003"
+      ],
+      "interval": 1800,
+      "shuffle": true
+    },
+    {
+      "id": "BBBBBBBB-0000-0000-0000-000000000002",
+      "name": "Focus",
+      "wallpapers": ["AAAAAAAA-0000-0000-0000-000000000002"],
+      "interval": 90.5,
+      "shuffle": false
+    }
+  ],
+  "rotation": [
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000002",
+      "state": {
+        "current": "AAAAAAAA-0000-0000-0000-000000000003",
+        "position": 2,
+        "upcoming": ["AAAAAAAA-0000-0000-0000-000000000001"],
+        "lastRotation": 811677600.25
+      }
+    }
+  ],
+  "pauseRules": {
+    "whenDesktopCovered": true,
+    "whenDisplayAsleepOrLocked": false,
+    "inLowPowerMode": true,
+    "onBattery": true
+  },
+  "pausedDisplays": ["DDDDDDDD-0000-0000-0000-000000000001"],
+  "isMuted": true,
+  "sortOrder": "name",
+  "recents": [
+    "AAAAAAAA-0000-0000-0000-000000000003",
+    "AAAAAAAA-0000-0000-0000-000000000001"
+  ],
+  "hotkeys": [
+    { "action": "pauseOrResumeAll", "keyCode": 35, "modifiers": 3, "keyLabel": "P" },
+    { "action": "nextWallpaper", "keyCode": 45, "modifiers": 3, "keyLabel": "N" }
+  ],
+  "loginItemIntent": {
+    "openAtLogin": true,
+    "bundle": {
+      "path": "/Applications/Livepaper.app",
+      "designatedRequirement": "identifier \"app.livepaper.Livepaper\" and certificate leaf = H\"67414494ac0200d42031aa6a382507f4197d3de7\""
+    }
+  }
+}

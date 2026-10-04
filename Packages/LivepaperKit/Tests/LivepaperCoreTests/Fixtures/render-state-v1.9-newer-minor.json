@@ -1,0 +1,32 @@
+{
+  "version": { "major": 1, "minor": 9 },
+  "generation": 43,
+  "stopped": false,
+  "crossfadeSeconds": 1.5,
+  "displays": [
+    {
+      "display": "DDDDDDDD-0000-0000-0000-000000000001",
+      "wallpaper": "AAAAAAAA-0000-0000-0000-000000000001",
+      "optimisedCopy": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/wallpaper.mov",
+      "poster": "wallpapers/AAAAAAAA-0000-0000-0000-000000000001/poster.heic",
+      "presentation": {
+        "fit": "fill",
+        "focalPoint": { "x": 0.5, "y": 0.5 },
+        "zoom": 1,
+        "pan": { "x": 0, "y": 0 },
+        "rotationDegrees": 90
+      },
+      "volume": 0,
+      "userPaused": false,
+      "playbackRate": 0.5
+    }
+  ],
+  "pauseRules": {
+    "whenDesktopCovered": true,
+    "whenDisplayAsleepOrLocked": true,
+    "inLowPowerMode": true,
+    "onBattery": false,
+    "whenGaming": true
+  },
+  "conditions": null
+}
