@@ -24,7 +24,8 @@ codesign -d -r- /Applications/Livepaper.app/Contents/Extensions/WallpaperExtensi
 
 <!-- requirement: made by `make notices` from Tools/release/designated-requirement.txt; edit that, not this -->
 ```text
-Not made yet: Tools/release/make-cert.sh records it with the certificate, before the first release.
+designated => identifier "app.livepaper.Livepaper" and certificate leaf = H"4389775aa4a3dc7facd524a7d06bbae62f77fccf"
+designated => identifier "app.livepaper.Livepaper.WallpaperExtension" and certificate leaf = H"4389775aa4a3dc7facd524a7d06bbae62f77fccf"
 ```
 <!-- /requirement -->
 
@@ -55,7 +56,7 @@ make            # generate the Xcode project, lint, test, build
 | `make test` | Swift Testing suites in both packages and the release tools |
 | `make build` | Build the app, the Gallery and the CLI |
 | `make ffmpeg` | Build the ffmpeg helper from source (`Helpers/ffmpeg/`). The import tests that convert WebM, MKV, AVI, WMV and GIF are skipped without it |
-| `make notices` | Write the notices into `Resources/Credits.rtf` and this README, from what ships |
+| `make notices` | Write the notices into `Resources/Credits.rtf`, and the signing requirement into this README |
 | `make release-dry-run` | Every release step but publishing, ad-hoc signed, into `build/release/` (`Tools/release/README.md`) |
 | `make shader-tools` | Build the shader tools, glslang and SPIRV-Cross, from source (`Helpers/shader-tools/`). Import uses them to translate a scene's shaders to Metal, and the tests that translate shaders are skipped without them |
 
@@ -74,64 +75,4 @@ make            # generate the Xcode project, lint, test, build
 
 ## License
 
-[MIT](LICENSE). The notices below are the ones the app's About panel shows and the disk image's `Licenses` folder holds, with the licence texts:
-
-<!-- notices: made by `make notices` from what ships; edit Tools/release/Sources/ReleaseKit/Notices.swift, not this -->
-```text
-Livepaper is free software under the MIT License. Copyright (c) 2026 Livepaper
-contributors.
-
-It includes, or ships beside it, the work below. The licence texts are in the
-Licenses folder on the disk image and in the source repository.
-
-Phosphene, commit 8b5bd57
-  https://github.com/kageroumado/phosphene
-  MIT License. Copyright (c) 2026 kageroumado. The wallpaper extension adapts
-  code from it; NOTICE lists the files.
-
-Sparkle 2.10.0
-  https://sparkle-project.org
-  MIT License, with the notices of the code it includes. It checks for and
-  installs Livepaper's updates.
-
-ffmpeg 9.0.2, the import helper
-  https://ffmpeg.org
-  GNU Lesser General Public License, version 2.1 or later. A separate program,
-  Livepaper.app/Contents/MacOS/ffmpeg, that converts WebM, MKV, AVI, WMV and GIF
-  files at import. Built without GPL or non-free parts and without network
-  support, from this source archive:
-    https://ffmpeg.org/releases/ffmpeg-9.0.2.tar.xz
-    sha256 8c3850283eb25fa026482078a04051e0be17347b09ef81a0849bec15a96e002e
-  This release of Livepaper carries a copy of that archive, with the build
-  script and the configure line:
-    https://github.com/oTerminal/Livepaper/releases/download/v0.1.0/ffmpeg-9.0.2.tar.xz
-  To run your own ffmpeg build instead of this one:
-    defaults write app.livepaper.Livepaper FFmpegReplacement /path/to/ffmpeg
-  and to go back to this one:
-    defaults delete app.livepaper.Livepaper FFmpegReplacement
-
-glslang 16.6.0, a shader tool
-  https://github.com/KhronosGroup/glslang
-  BSD-3-Clause, with BSD-2-Clause, Apache-2.0 and MIT for some files, NVIDIA's
-  licence for the preprocessor, and GPL-3.0-or-later with the Bison exception
-  2.2 for its generated parser. A separate program that translates a scene's
-  shaders at import.
-
-SPIRV-Cross vulkan-sdk-1.4.357.0, a shader tool
-  https://github.com/KhronosGroup/SPIRV-Cross
-  Apache-2.0; the SPIR-V headers it compiles in are MIT and Khronos's free-use
-  licence. A separate program that translates a scene's shaders at import.
-
-The sample wallpapers
-  Autumn Stream: "Autumn Leaves in River Water" by Free Nature Stock, CC0 1.0
-    https://freenaturestock.com/video/autumn-leaves-in-river-water/
-  Golden Maple: "Clouds Above a Maple Tree" by Free Nature Stock, CC0 1.0
-    https://freenaturestock.com/video/clouds-above-a-maple-tree/
-  Tall Grass: "Tall Grass Blowing in the Wind" by Free Nature Stock, CC0 1.0
-    https://freenaturestock.com/video/tall-grass-blowing-in-the-wind/
-  Cut from the videos above. CC0 1.0 is a public-domain dedication:
-  https://creativecommons.org/publicdomain/zero/1.0/
-```
-<!-- /notices -->
-
-The ffmpeg helper is a separate program under the LGPL, built from source by `Helpers/ffmpeg/build.sh`; see `Helpers/ffmpeg/README.md`. The shader tools are separate programs under permissive licences, built from source by `Helpers/shader-tools/build.sh`; see `Helpers/shader-tools/README.md` and [NOTICE](NOTICE).
+[MIT](LICENSE). The ffmpeg helper is a separate program under the LGPL, built from source by `Helpers/ffmpeg/build.sh`; see `Helpers/ffmpeg/README.md`. The shader tools are separate programs under permissive licences, built from source by `Helpers/shader-tools/build.sh`; see `Helpers/shader-tools/README.md` and [NOTICE](NOTICE).

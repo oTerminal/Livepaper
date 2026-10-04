@@ -80,6 +80,7 @@ targets:
         # this key. Checked once a day, sending nothing about the Mac, and an update
         # is downloaded and installed only when the user clicks for it.
         SUFeedURL: https://oterminal.github.io/Livepaper/appcast.xml
+        SUPublicEDKey: JIHef7P5oxdIy/JF3HppqM3gVfJpguRom1DnfYsF0UQ=
         SUEnableAutomaticChecks: true
         SUScheduledCheckInterval: 86400
         SUEnableSystemProfiling: false

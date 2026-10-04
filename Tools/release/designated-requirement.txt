@@ -1,0 +1,5 @@
+# The designated requirement of every Livepaper release: the app's
+# and the extension's, under the "Livepaper Release" certificate. Written once by
+# Tools/release/make-cert.sh; a release whose signature says anything else is refused.
+designated => identifier "app.livepaper.Livepaper" and certificate leaf = H"4389775aa4a3dc7facd524a7d06bbae62f77fccf"
+designated => identifier "app.livepaper.Livepaper.WallpaperExtension" and certificate leaf = H"4389775aa4a3dc7facd524a7d06bbae62f77fccf"

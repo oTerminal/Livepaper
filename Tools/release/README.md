@@ -27,7 +27,7 @@ The workflow refuses, with the reason in its log and nothing published, when any
 - the signature is ad-hoc or by another certificate
 - a secret is missing
 - `CHANGELOG.md` has no section for the version
-- the notices in `Credits.rtf` or the README are stale
+- the notices in `Credits.rtf`, or the README's requirement, are stale
 - anything `verify.sh` refuses
 
 ## The scripts

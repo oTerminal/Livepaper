@@ -32,7 +32,7 @@ let usage = """
       appcast merge --generated <file> --url <zip-url> --feed-url <url> [--appcast <file>] [--changelog CHANGELOG.md]
           Prints the appcast with the release generate_appcast signed added, its notes from the changelog.
       notices --root <repo> (--write | --check | --out <dir>)
-          Writes, checks, or puts in <dir> the notices: NOTICES.txt, Credits.rtf, and the README's notices and requirement.
+          Writes, checks, or puts in <dir> the notices: NOTICES.txt and Credits.rtf; and the README's requirement.
       throwaway-key <dir>
           Makes an EdDSA key pair for a dry run: the private key in <dir>, the public key printed.
     """
@@ -245,20 +245,18 @@ func notices(_ arguments: Arguments) throws {
     let readme = try read(path("README.md"))
     if arguments.flag("write") {
         try write(credits, to: path("Resources/Credits.rtf"))
-        var updated = try Notices.readme(readme, section: "notices", carrying: text)
-        updated = try Notices.readme(updated, section: "requirement", carrying: requirement)
+        let updated = try Notices.readme(readme, section: "requirement", carrying: requirement)
         try write(updated, to: path("README.md"))
-        print("wrote Resources/Credits.rtf, and README.md's notices and requirement")
+        print("wrote Resources/Credits.rtf, and README.md's requirement")
     }
     if arguments.flag("check") {
         var stale: [String] = []
         if try readIfThere(path("Resources/Credits.rtf")) != credits { stale.append("Resources/Credits.rtf") }
-        if try Notices.readmeText(readme, section: "notices") + "\n" != text { stale.append("README.md's notices") }
         if try Notices.readmeText(readme, section: "requirement") + "\n" != requirement { stale.append("README.md's requirement") }
         guard stale.isEmpty else {
             throw Refusal("\(stale.joined(separator: ", ")) differ from what ships: run make notices and commit")
         }
-        print("Credits.rtf and README.md carry the notices and the requirement that ship")
+        print("Credits.rtf carries the notices, and README.md the requirement, that ship")
     }
     if let out = arguments.option("out") {
         try write(text, to: URL(filePath: out).appending(path: "NOTICES.txt").path)
